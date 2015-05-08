@@ -53,6 +53,12 @@ public class RollingLogger {
 	 */
 	public RollingLogger(String dir, String name, long fileSize,
 			int maxFileCount) {
+		if(fileSize <= 0){
+			throw new IllegalArgumentException("file size must > 0 byte");
+		}
+		if(maxFileCount <= 0){
+			throw new IllegalArgumentException("file count must > 0");
+		}
 		mDir = dir;
 		mName = name;
 		mFileSize = fileSize;
