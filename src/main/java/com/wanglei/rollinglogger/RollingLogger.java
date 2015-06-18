@@ -21,6 +21,10 @@ public class RollingLogger {
 	 * separate log file name from index
 	 */
 	private static final String COUNT_SEPARATOR = "_";
+	/**
+	 * line separator
+	 */
+	private static final String LINE_SEPARATOR = System.getProperty("line.separator");
 
 	/**
 	 * log file dir
@@ -57,13 +61,12 @@ public class RollingLogger {
 			throw new IllegalArgumentException("file size must > 0 byte");
 		}
 		if(maxFileCount <= 0){
-			throw new IllegalArgumentException("file count must > 0");
+			throw new IllegalArgumentException("file count must > 0"); 
 		}
 		mDir = dir;
 		mName = name;
 		mFileSize = fileSize;
 		mMaxFileCount = maxFileCount;
-
 		File dirFile = new File(mDir);
 		if (!dirFile.exists()) {
 			dirFile.mkdirs();
@@ -84,9 +87,16 @@ public class RollingLogger {
 			rotateLogFiles();
 			writeLogToFile(log, file, false);
 		}
-
 	}
 
+	/**
+	 * write a log in a line
+	 * @param log
+	 */
+	public synchronized void writeLogLine(String log) {
+		writeLog(log + LINE_SEPARATOR);
+	}
+	
 	private void writeLogToFile(String log, File file, boolean append) {
 		try {
 			FileOutputStream fos = new FileOutputStream(file, append);
