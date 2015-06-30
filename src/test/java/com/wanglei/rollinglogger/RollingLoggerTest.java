@@ -24,9 +24,18 @@ public class RollingLoggerTest {
 	@Rule
     public TemporaryFolder testFolder = new TemporaryFolder();
 	
+	private static long mMaxLogFileSize;
+	private static int mMaxLogFileCount;
+	
+	private File mLogDir;
+	private FilenameFilter mFilter;
+	private RollingLogger mLogger;
+	
     @BeforeClass
     public static void oneTimeSetUp() {
         // one-time initialization code
+    	mMaxLogFileSize = 1024;
+    	mMaxLogFileCount = 5;
     }
  
     @AfterClass
@@ -35,7 +44,16 @@ public class RollingLoggerTest {
     }
  
     @Before
-    public void setUp() {
+    public void setUp() throws IOException {
+    	mLogDir = testFolder.newFolder("log");
+    	final String logFileName = "log";
+    	mFilter = new FilenameFilter() {
+			public boolean accept(File dir, String name) {
+				return name.startsWith(logFileName);
+			}
+		};
+    	mLogger = new RollingLogger(mLogDir.getPath(), logFileName, 
+    			mMaxLogFileSize, mMaxLogFileCount);
     }
  
     @After
@@ -44,35 +62,45 @@ public class RollingLoggerTest {
     
     @Test
     public void testWriteLog() throws IOException {
-    	File logFolder = testFolder.newFolder("log");
-    	final String logFileName = "log";
-    	FilenameFilter filter = new FilenameFilter() {
-			public boolean accept(File dir, String name) {
-				return name.startsWith(logFileName);
-			}
-		};
-    	long maxLogFileSize = 1024;
-    	int maxLogFileCount = 5;
-    	RollingLogger logger = new RollingLogger(logFolder.getPath(), logFileName, 
-    			maxLogFileSize, maxLogFileCount);
-    	
-    	writeLog(logger, "This is a short log.", 5);
-    	System.out.println(logFolder.listFiles(filter).length);
-    	// make sure log file count is no more than maxLogFileCount
-    	Assert.assertTrue(logFolder.listFiles(filter).length <= maxLogFileCount);
-    	
-    	writeLog(logger, "This is another short log.", 100);
-    	System.out.println(logFolder.listFiles(filter).length);
-    	// make sure log file count is no more than maxLogFileCount
-    	Assert.assertTrue(logFolder.listFiles(filter).length <= maxLogFileCount);
-    	
-    	writeLog(logger, "This is a very very very very very very very very very very very very very very very very very very very very very very very very very very very very very very very very very very very very very very very very very very very very very very very very very very very very very very very very very very very very long log.",
+    	writeLogs("This is a short log.", 5);
+    	writeLogs("This is another short log.", 100);
+    	writeLogs("This is a very very very very very very very very very very very very very very very very very very very very very very very very very very very very very very very very very very very very very very very very very very very very very very very very very very very very very very very very very very very very long log.",
     			10000);
-    	System.out.println(logFolder.listFiles(filter).length);
-    	// make sure log file count is no more than maxLogFileCount
-    	Assert.assertTrue(logFolder.listFiles(filter).length <= maxLogFileCount);
     	
-    	List<File> fileList = Arrays.asList(logFolder.listFiles(filter));
+    	checkLogFilesModifiedOrder();
+    }
+    
+    @Test
+    public void testWriteLogLine() throws IOException {
+    	writeLogLines("This is a short log.", 5);
+    	writeLogLines("This is another short log.", 100);
+    	writeLogLines("This is a very very very very very very very very very very very very very very very very very very very very very very very very very very very very very very very very very very very very very very very very very very very very very very very very very very very very very very very very very very very very long log.",
+    			10000);
+    	
+    	checkLogFilesModifiedOrder();
+    }
+    
+    private void writeLogs(String log, int lineCount){
+    	for(int index = 0; index < lineCount; index++){
+    		mLogger.writeLog(log);
+    	}
+    	checkLogFilesCount();
+    }
+    
+    private void writeLogLines(String log, int lineCount){
+    	for(int index = 0; index < lineCount; index++){
+    		mLogger.writeLogLine(log);
+    	}
+    	checkLogFilesCount();
+    }
+    
+    private void checkLogFilesCount(){
+    	// make sure log file count is no more than maxLogFileCount
+    	Assert.assertTrue(mLogDir.listFiles(mFilter).length <= mMaxLogFileCount);
+    }
+    
+    private void checkLogFilesModifiedOrder(){
+    	List<File> fileList = Arrays.asList(mLogDir.listFiles(mFilter));
     	Collections.sort(fileList, new Comparator<File>() {
     		
 			@Override
@@ -84,14 +112,7 @@ public class RollingLoggerTest {
     	// make sure the more recently modified file has the smaller index
     	for(int index = 0; index < fileList.size(); index++){
     		File file = fileList.get(index);
-    		Assert.assertEquals(index, logger.getLogFileIndex(file.getName()));
-    	}
-    	
-    }
-    
-    private void writeLog(RollingLogger logger, String log, int lineCount){
-    	for(int index = 0; index < lineCount; index++){
-    		logger.writeLog(log);
+    		Assert.assertEquals(index, mLogger.getLogFileIndex(file.getName()));
     	}
     }
  
