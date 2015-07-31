@@ -10,6 +10,7 @@ logger.writeLogLine("This is a log line.");
 
 ## Credits
 * NIKEDLAB's [LOG ROLLING LIBRARY][1]
+[1]: http://nikedlab.com/android-log-rolling-library.html#
 
 ## License
 
@@ -26,5 +27,3 @@ logger.writeLogLine("This is a log line.");
     WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
     See the License for the specific language governing permissions and
     limitations under the License.
-    
-   [1]: http://nikedlab.com/android-log-rolling-library.html#
