@@ -2,9 +2,9 @@
 	xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
 	<modelVersion>4.0.0</modelVersion>
 
-	<groupId>com.wanglei</groupId>
-	<artifactId>rollinglogger</artifactId>
-	<version>0.0.2-SNAPSHOT</version>
+	<groupId>com.github.crazyorr</groupId>
+	<artifactId>rolling-logger</artifactId>
+	<version>0.0.2</version>
 	<packaging>jar</packaging>
 
 	<name>RollingLogger</name>
@@ -12,28 +12,26 @@
 	<url>https://github.com/CrazyOrr/RollingLogger</url>
 	<inceptionYear>2015</inceptionYear>
 
-	<properties>
-		<project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
-
-		<java.version>1.6</java.version>
-	</properties>
-
 	<developers>
 		<developer>
-			<id>wanglei</id>
-			<name>wanglei</name>
+			<id>CrazyOrr</id>
+			<name>Lei Wang</name>
 			<email>wanglei021212@gmail.com</email>
 		</developer>
 	</developers>
 
 	<licenses>
 		<license>
-			<name>Apache 2</name>
+			<name>Apache License, Version 2.0</name>
 			<url>http://www.apache.org/licenses/LICENSE-2.0.txt</url>
 			<distribution>repo</distribution>
 			<comments>A business-friendly OSS license</comments>
 		</license>
 	</licenses>
+
+	<scm>
+		<url>http://svn.apache.org/viewvc/maven</url>
+	</scm>
 
 	<dependencies>
 		<dependency>
@@ -43,6 +41,12 @@
 			<scope>test</scope>
 		</dependency>
 	</dependencies>
+
+	<properties>
+		<project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
+
+		<java.version>1.6</java.version>
+	</properties>
 
 	<build>
 		<plugins>

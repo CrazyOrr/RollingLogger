@@ -1,4 +1,4 @@
-package com.wanglei.rollinglogger;
+package com.github.crazyorr.rollinglogger;
 
 import java.io.File;
 import java.io.FilenameFilter;
@@ -16,6 +16,8 @@ import org.junit.BeforeClass;
 import org.junit.Rule;
 import org.junit.Test;
 import org.junit.rules.TemporaryFolder;
+
+import com.github.crazyorr.rollinglogger.RollingLogger;
 
 /**
  * Unit test for RollingLogTest.

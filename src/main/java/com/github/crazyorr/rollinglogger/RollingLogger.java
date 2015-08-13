@@ -1,4 +1,4 @@
-package com.wanglei.rollinglogger;
+package com.github.crazyorr.rollinglogger;
 
 import java.io.File;
 import java.io.FileNotFoundException;
