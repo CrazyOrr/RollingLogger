@@ -1,9 +1,10 @@
 # RollingLogger
-A Java library for rolling log to external storage.
+A Java library for writing logs into a fix number of files in rolling
+order, in case the log files' size grows immensely.
 
 ## Usage
 ```java
-RollingLogger logger = new RollingLogger(logFilePath, logFileName, maxLogFileSize, maxLogFileCount);
+RollingLogger logger = new RollingLogger(logFilePath, logFileName, logFileMaxSize, maxLogFileCount);
 logger.writeLog("This is a log.");
 logger.writeLogLine("This is a log line.");
 ```

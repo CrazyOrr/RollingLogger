@@ -4,21 +4,13 @@
 
 	<groupId>com.github.crazyorr</groupId>
 	<artifactId>rolling-logger</artifactId>
-	<version>0.0.2</version>
+	<version>0.1.0</version>
 	<packaging>jar</packaging>
 
-	<name>RollingLogger</name>
-	<description>A Java library for rolling log to external storage.</description>
+	<name>${project.groupId}:${project.artifactId}</name>
+	<description>A Java library for writing logs into a fix number of files in rolling order, in case the log files' size grows immensely.</description>
 	<url>https://github.com/CrazyOrr/RollingLogger</url>
 	<inceptionYear>2015</inceptionYear>
-
-	<developers>
-		<developer>
-			<id>CrazyOrr</id>
-			<name>Lei Wang</name>
-			<email>wanglei021212@gmail.com</email>
-		</developer>
-	</developers>
 
 	<licenses>
 		<license>
@@ -29,8 +21,18 @@
 		</license>
 	</licenses>
 
+	<developers>
+		<developer>
+			<name>Lei Wang</name>
+			<email>wanglei021212@gmail.com</email>
+			<url>https://github.com/CrazyOrr</url>
+		</developer>
+	</developers>
+
 	<scm>
-		<url>http://svn.apache.org/viewvc/maven</url>
+		<connection>scm:git:https://github.com/CrazyOrr/RollingLogger.git</connection>
+		<developerConnection>scm:git:https://github.com/CrazyOrr/RollingLogger.git</developerConnection>
+		<url>https://github.com/CrazyOrr/RollingLogger.git</url>
 	</scm>
 
 	<dependencies>
@@ -44,7 +46,6 @@
 
 	<properties>
 		<project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
-
 		<java.version>1.6</java.version>
 	</properties>
 
@@ -59,6 +60,44 @@
 					<source>${java.version}</source>
 					<target>${java.version}</target>
 				</configuration>
+			</plugin>
+			<plugin>
+				<groupId>org.apache.maven.plugins</groupId>
+				<artifactId>maven-source-plugin</artifactId>
+				<executions>
+					<execution>
+						<id>attach-sources</id>
+						<goals>
+							<goal>jar-no-fork</goal>
+						</goals>
+					</execution>
+				</executions>
+			</plugin>
+			<plugin>
+				<groupId>org.apache.maven.plugins</groupId>
+				<artifactId>maven-javadoc-plugin</artifactId>
+				<executions>
+					<execution>
+						<id>attach-javadocs</id>
+						<goals>
+							<goal>jar</goal>
+						</goals>
+					</execution>
+				</executions>
+			</plugin>
+			<plugin>
+				<groupId>org.apache.maven.plugins</groupId>
+				<artifactId>maven-gpg-plugin</artifactId>
+				<version>1.6</version>
+				<executions>
+					<execution>
+						<id>sign-artifacts</id>
+						<phase>verify</phase>
+						<goals>
+							<goal>sign</goal>
+						</goals>
+					</execution>
+				</executions>
 			</plugin>
 		</plugins>
 	</build>
