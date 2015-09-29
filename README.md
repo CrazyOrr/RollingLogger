@@ -2,6 +2,8 @@
 A Java library for writing logs into a fix number of files in rolling
 order, in case the log files' size grows immensely.
 
+[![Build Status](https://travis-ci.org/CrazyOrr/RollingLogger.svg?branch=master)](https://travis-ci.org/CrazyOrr/RollingLogger)
+
 ## Download
 ### Maven
 ```xml
