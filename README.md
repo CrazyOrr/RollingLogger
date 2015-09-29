@@ -2,6 +2,20 @@
 A Java library for writing logs into a fix number of files in rolling
 order, in case the log files' size grows immensely.
 
+## Download
+### Maven
+```xml
+<dependency>
+	<groupId>com.github.crazyorr</groupId>
+	<artifactId>rolling-logger</artifactId>
+	<version>0.1.0</version>
+</dependency>
+```
+### Gradle
+```gradle
+compile 'com.github.crazyorr:rolling-logger:0.1.0'
+```
+
 ## Usage
 ```java
 RollingLogger logger = new RollingLogger(logFilePath, logFileName, logFileMaxSize, maxLogFileCount);
