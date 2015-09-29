@@ -194,7 +194,7 @@ public class RollingLogger {
 	 *            Log file name with index appended
 	 * @return Log file index
 	 */
-	public int getLogFileIndex(String fileName) {
+	private int getLogFileIndex(String fileName) {
 		int fileIndex = 0;
 		try {
 			fileIndex = Integer.parseInt(fileName.substring(fileName

@@ -1,12 +1,18 @@
 package com.github.crazyorr.rollinglogger;
 
+import java.io.BufferedReader;
 import java.io.File;
+import java.io.FileInputStream;
 import java.io.FilenameFilter;
 import java.io.IOException;
-import java.util.Arrays;
-import java.util.Collections;
-import java.util.Comparator;
+import java.io.InputStreamReader;
+import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
+import java.util.TreeSet;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 import org.junit.After;
 import org.junit.AfterClass;
@@ -16,8 +22,6 @@ import org.junit.BeforeClass;
 import org.junit.Rule;
 import org.junit.Test;
 import org.junit.rules.TemporaryFolder;
-
-import com.github.crazyorr.rollinglogger.RollingLogger;
 
 /**
  * Unit test for RollingLogger.
@@ -64,68 +68,97 @@ public class RollingLoggerTest {
 
 	@Test
 	public void testWriteLog() throws IOException {
-		writeLogs("This is a short log.", 5);
-		writeLogs("This is another short log.", 100);
-		writeLogs(
-				"This is a very very very very very very very very very very very very very very very very very very very very very very very very very very very very very very very very very very very very very very very very very very very very very very very very very very very very very very very very very very very very long log.",
-				10000);
+		mLogger.writeLog("This is a log.");
+		checkLogFilesNumber();
+		
+		int count = 0;
+		String logTemplate = "This is log <%s>.";
+		while(mLogDir.listFiles(mFilter).length < mMaxLogFileCount){
+			mLogger.writeLog(String.format(logTemplate, count++));
+		}
+		for(int index = 0; index < count; index++){
+			mLogger.writeLog(String.format(logTemplate, (count + index)));
+		}
+		checkLogFilesNumber();
 
-		checkLogFilesModifiedOrder();
+		Map<File, List<Integer>> map = new HashMap<File, List<Integer>>();
+		for(File file : mLogDir.listFiles(mFilter)){
+			FileInputStream fis = new FileInputStream(file);
+			InputStreamReader isr = new InputStreamReader(fis);
+			BufferedReader br = new BufferedReader(isr);
+			String line = br.readLine();
+			
+			Pattern p = Pattern.compile("\\d+");
+			Matcher m = p.matcher(line);
+			List<Integer> list = new ArrayList<Integer>();
+			while(m.find()){
+				list.add(Integer.parseInt(m.group()));
+			}
+			map.put(file, list);
+			br.close();
+		}
+		
+		checkLogFilesOrder(map);
 	}
-
+	
 	@Test
 	public void testWriteLogLine() throws IOException {
-		writeLogLines("This is a short log.", 5);
-		writeLogLines("This is another short log.", 100);
-		writeLogLines(
-				"This is a very very very very very very very very very very very very very very very very very very very very very very very very very very very very very very very very very very very very very very very very very very very very very very very very very very very very very very very very very very very very long log.",
-				10000);
-
-		checkLogFilesModifiedOrder();
-	}
-
-	private void writeLogs(String log, int lineCount) {
-		try {
-			for (int index = 0; index < lineCount; index++) {
-				mLogger.writeLog(log);
-			}
-		} catch (IOException e) {
-			e.printStackTrace();
+		mLogger.writeLogLine("This is a log.");
+		checkLogFilesNumber();
+		
+		int count = 0;
+		String logTemplate = "This is log <%s>.";
+		while(mLogDir.listFiles(mFilter).length < mMaxLogFileCount){
+			mLogger.writeLogLine(String.format(logTemplate, count++));
 		}
-		checkLogFilesQuantity();
-	}
-
-	private void writeLogLines(String log, int lineCount) {
-		try {
-			for (int index = 0; index < lineCount; index++) {
-				mLogger.writeLogLine(log);
-			}
-		} catch (IOException e) {
-			e.printStackTrace();
+		for(int index = 0; index < count; index++){
+			mLogger.writeLogLine(String.format(logTemplate, (count + index)));
 		}
-		checkLogFilesQuantity();
+		checkLogFilesNumber();
+		
+		Map<File, List<Integer>> map = new HashMap<File, List<Integer>>();
+		for(File file : mLogDir.listFiles(mFilter)){
+			FileInputStream fis = new FileInputStream(file);
+			InputStreamReader isr = new InputStreamReader(fis);
+			BufferedReader br = new BufferedReader(isr);
+			List<Integer> list = new ArrayList<Integer>();
+			String line;
+			while ((line = br.readLine()) != null) {
+				Pattern p = Pattern.compile("\\d+");
+				Matcher m = p.matcher(line);
+				while(m.find()){
+					list.add(Integer.parseInt(m.group()));
+				}
+		    }
+			map.put(file, list);
+			br.close();
+		}
+		
+		checkLogFilesOrder(map);
 	}
 
-	private void checkLogFilesQuantity() {
+	private void checkLogFilesNumber() {
 		// make sure log file count is no more than maxLogFileCount
-		Assert.assertTrue(mLogDir.listFiles(mFilter).length <= mMaxLogFileCount);
+		int logFilesNumber = mLogDir.listFiles(mFilter).length;
+		Assert.assertTrue(logFilesNumber > 0 && logFilesNumber <= mMaxLogFileCount);
 	}
 
-	private void checkLogFilesModifiedOrder() {
-		List<File> fileList = Arrays.asList(mLogDir.listFiles(mFilter));
-		Collections.sort(fileList, new Comparator<File>() {
-
-			@Override
-			public int compare(File lhs, File rhs) {
-				// the one which had been modified later comes in front
-				return (int) (rhs.lastModified() - lhs.lastModified());
+	private void checkLogFilesOrder(Map<File, List<Integer>> map) {
+		TreeSet<File> fileSet = new TreeSet<File>(map.keySet());
+		final int NONE = 0;
+		int lastFileFirstLogNumber = NONE;
+		for(File file : fileSet){
+			System.out.println(file.getName());
+			List<Integer> logNumberList = map.get(file);
+			int firstLogNumber = logNumberList.get(0);
+			int lastLogNumber = logNumberList.get(logNumberList.size() - 1);
+			System.out.println(file.getName() + " firstLogNumber = " + firstLogNumber
+					+ " lastLogNumber = " + lastLogNumber);
+			if(lastFileFirstLogNumber != NONE){
+				Assert.assertEquals(lastFileFirstLogNumber - 1, lastLogNumber);
 			}
-		});
-		// make sure the more recently modified file has the smaller index
-		for (int index = 0; index < fileList.size(); index++) {
-			File file = fileList.get(index);
-			Assert.assertEquals(index, mLogger.getLogFileIndex(file.getName()));
+			lastFileFirstLogNumber = firstLogNumber;
+			Assert.assertTrue(firstLogNumber <= lastLogNumber);
 		}
 	}
-
 }
